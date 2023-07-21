@@ -2,17 +2,19 @@
     "manifest_version": 3,
     "name": "Extension for Downloader",
     "version": "1.0",
-    "description": "entension que descarga el audio a un directorio",
+    "description": "Extensión que descarga el audio a un directorio",
     "permissions": [
-        "clipboardWrite",
-        "activeTab",
-        "storage",
-        "tabs"
+      "clipboardWrite",
+      "activeTab",
+      "storage",
+      "tabs"
     ],
     "icons": {
-        "16": "logo16.png"
+      "16": "logo16.png"
     },
     "action": {
-        "default_popup": "popup.html"
+      "default_popup": "popup.html",
+      "default_encoding": "utf-8"
     }
-}
+  }
+  
