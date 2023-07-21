@@ -1,10 +1,9 @@
 import os
 import re
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, jsonify
 from pytube import YouTube, Playlist
 from flask_cors import CORS
 from moviepy.editor import VideoFileClip
-
 
 app = Flask(__name__)
 CORS(app)
@@ -41,43 +40,55 @@ def download_video(link, savePath):
     return filename
 
 
+def download_playlist(playlist_link, savePath):
+    playlist = Playlist(playlist_link)
+
+    for video_url in playlist.video_urls:
+        try:
+            download_video(video_url, savePath)
+        except Exception as e:
+            print(f"Error downloading video: {e}")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         data = request.get_json()
         link = data.get('link')
         savePath = data.get('directory')
-        print('===>', link)
+
         try:
-            fileName = download_video(link, savePath)
-            message = '🎶 Successful completed ' + fileName
+            if 'playlist' in link.lower():
+                download_playlist(link, savePath)
+                message = '🎶 Successful Downloaded Playlist!'
+            else:
+                download_video(link, savePath)
+                message = '🎶 Successful Downloaded Video!'
+
             print(message)
             response = {
                 'status': 'Success',
                 'message': message,
             }
             return jsonify(response)
-        except:
+        except Exception as e:
             response = {
                 'status': 'Error',
-                'message': 'An error occurred. Please check and retry.',
+                'message': f'An error occurred: {e}',
             }
             return jsonify(response)
     else:
         return jsonify(message="Servicio de descarga y conversion de music.youtube.com")
 
-# Resto del código igual...
-
 
 def clean(videoFileName):
     os.remove(os.path.join('media', videoFileName))
-    print("Video Data is Cleared!!!!")
 
 
 def nameConverter(title):
     # Remover espacios dobles
     title = re.sub(r'\s+', ' ', title)
-    special_characters = ['*', '°', '|']
+    special_characters = ['°', '|', '/', '?', '*', '"']
 
     # Remover caracteres especiales usando una expresión regular
     special_characters_regex = '|'.join(map(re.escape, special_characters))
@@ -87,4 +98,4 @@ def nameConverter(title):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
