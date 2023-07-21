@@ -43,3 +43,9 @@ Ejecutar el servidor
 ```bash
 python3 app.py
 ```
+# AGREGAR LA EXTENSION EN LA NAVEGADOR
+
+ingresa configuracion del navegador, hacia las entensions
+brave://extensions/
+- activar el modo desarrollador
+- luego cargar paquete o cargar extension, seleccionar el directorio de chrome_extension
