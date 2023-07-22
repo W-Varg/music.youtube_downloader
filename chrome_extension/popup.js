@@ -39,11 +39,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }),
       })
         .then(response => {
-          if (!response.ok)
+          if (!response.ok) {
             throw new Error('La petición no fue exitosa.');
+          }
           return response.json();
         })
-        .then(({ message }) => showAlert(message || 'Petición completada.'))
+        .then(data => {
+          const { audioName } = data;
+          const audioURL = `http://172.27.39.12:5000/media/${encodeURIComponent(audioName)}`;
+
+          // Enviar mensaje al servicio de fondo para descargar el archivo
+          chrome.runtime.sendMessage({
+            action: 'downloadAudio',
+            audioURL,
+            audioName,
+          }, function (response) {
+            const { downloadId } = response;
+            if (downloadId) {
+              showAlert('Descarga de audio en progreso...');
+            } else {
+              showAlert('Error al iniciar la descarga.');
+            }
+          });
+        })
         .catch(() => showAlert('Error al realizar la petición.'));
     } else {
       showAlert(`No se encontró ninguna pestaña de ${service} abierta.`);

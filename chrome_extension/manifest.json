@@ -6,6 +6,7 @@
   "permissions": [
     "notifications",
     "activeTab",
+    "downloads",
     "storage",
     "tabs"
   ],
