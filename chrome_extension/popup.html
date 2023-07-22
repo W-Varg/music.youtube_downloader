@@ -2,13 +2,14 @@
 <html>
 <head>
   <title>Download audio</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="popup.js"></script>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <input type="text" id="directoryInput" placeholder="Directorio">
-  <button id="youtubeMusicButton">YT Music</button>
-  <button id="youtubeButton">YouTube</button>
+  <button id="youtubeMusicButton" data-service="YouTube Music">YT Music</button>
+  <button id="youtubeButton" data-service="YouTube">YouTube</button>
 </body>
 </html>

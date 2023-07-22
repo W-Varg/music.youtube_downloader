@@ -1,20 +1,22 @@
 {
-    "manifest_version": 3,
-    "name": "Extension for Downloader",
-    "version": "1.0",
-    "description": "Extensión que descarga el audio a un directorio",
-    "permissions": [
-      "clipboardWrite",
-      "activeTab",
-      "storage",
-      "tabs"
-    ],
-    "icons": {
-      "16": "logo16.png"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_encoding": "utf-8"
-    }
+  "manifest_version": 3,
+  "name": "Extension for Downloader",
+  "version": "1.0",
+  "description": "Extensión que descarga el audio a un directorio",
+  "permissions": [
+    "notifications",
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "icons": {
+    "16": "logo16.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_encoding": "utf-8"
+  },
+  "background": {
+    "service_worker": "background.js"
   }
-  
+}
