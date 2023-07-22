@@ -1,2 +1,16 @@
-/media
-/venv/
+# Ignore everything in the "env" directory
+media/*
+env/*
+*.mp3
+*.mp4
+
+# Except for the "miarchivo.txt" file
+!media/media.txt
+!env/enviroment.txt
+
+
+# Ignore all .pyc files
+*.pyc
+
+# Ignore the __pycache__ directory
+__pycache__/

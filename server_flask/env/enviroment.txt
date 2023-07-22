@@ -1,0 +1,6 @@
+execute a command into directory */server_flask
+python3 -m venv env
+
+
+then execute:
+source env/bin/activate

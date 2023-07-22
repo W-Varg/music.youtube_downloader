@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from flask import Flask, request, jsonify
 from pytube import YouTube, Playlist
 from flask_cors import CORS
@@ -8,36 +9,39 @@ from moviepy.editor import VideoFileClip
 app = Flask(__name__)
 CORS(app)
 
-
 def download_video(link, savePath):
-    yt = YouTube(link)
-    author = yt.author
-    title = yt.title
+    os.makedirs('media/videos', exist_ok=True)
 
+    yt = YouTube(link)
+
+    # Combine title and author to create the filename
+    author = yt.author
+    title = nameConverter(yt.title)
+    audioName = nameConverter(f"{author} - {title}") + '.mp3'
+    videoName = nameConverter(f"{author} - {title}") + '.mp4'
+    
     counter = 1
-    while os.path.exists(os.path.join('media', f'archivo{counter}.mp4')):
+    while os.path.exists(os.path.join('media/videos', videoName)):
         counter += 1
-    videoFileName = f'archivo{counter}.mp4'
+        videoName = nameConverter(f"{title} ({counter})") + '.mp4'
 
     # Descargar y guarda el archivo de video
     videoStream = yt.streams.get_highest_resolution()
-    videoStream.download('media', videoFileName)
+    videoStream.download('media/videos', videoName)
 
     # Cargar el video descargado y extrae el audio
-    video = VideoFileClip(os.path.join('media', videoFileName))
+    video = VideoFileClip(os.path.join('media/videos', videoName))
     audio = video.audio
 
-    # Combine title and author to create the filename
-    filename = nameConverter(f"{author} - {title}") + '.mp3'
     # Guardar el archivo de audio en el directorio "savePath"
-    audioFileName = os.path.join(savePath, filename)
+    audioFileName = os.path.join(savePath, audioName)
     audio.write_audiofile(audioFileName)
 
     # Eliminar el video descargado y limpia la memoria
-    clean(videoFileName)
+    # clean(videoName)
     video.close()
 
-    return filename
+    return audioName
 
 
 def download_playlist(playlist_link: str, savePath: str):
@@ -55,7 +59,7 @@ def index():
     if request.method == 'POST':
         data = request.get_json()
         link = data.get('link')
-        savePath = data.get('directory')
+        savePath = data.get('directory') or 'media'
 
         try:
             if 'playlist' in link.lower():
@@ -98,4 +102,15 @@ def nameConverter(title):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    # Get the IP address and port from the command-line argument
+    if len(sys.argv) > 1:
+        address = sys.argv[1]
+        ip, port = address.split(':')
+        port = int(port)
+    else:
+        ip = '0.0.0.0'
+        port = 5000
+    app.run(host=ip, port=port, debug=True)
+
+# example run server
+# python3 app.py 172.27.39.12:5000
