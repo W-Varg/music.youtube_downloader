@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from pytube import YouTube, Playlist
 from flask_cors import CORS
 from moviepy.editor import VideoFileClip
@@ -16,14 +16,14 @@ def download_video(link, savePath):
 
     # Combine title and author to create the filename
     author = yt.author
-    title = nameConverter(yt.title)
-    audioName = nameConverter(f"{author} - {title}") + '.mp3'
-    videoName = nameConverter(f"{author} - {title}") + '.mp4'
+    title = textSanitizer(yt.title)
+    audioName = textSanitizer(f"{author} - {title}") + '.mp3'
+    videoName = textSanitizer(f"{author} - {title}") + '.mp4'
     
     counter = 1
     while os.path.exists(os.path.join('media/videos', videoName)):
         counter += 1
-        videoName = nameConverter(f"{title} ({counter})") + '.mp4'
+        videoName = textSanitizer(f"{title} ({counter})") + '.mp4'
 
     # Descargar y guarda el archivo de video
     videoStream = yt.streams.get_highest_resolution()
@@ -41,8 +41,10 @@ def download_video(link, savePath):
     # clean(videoName)
     video.close()
 
-    return audioName
-
+    return {
+        'audioName': audioName,
+        'mimeType': 'audio/mpeg',  # Cambia esto según el tipo de archivo de audio que generes (ejemplo para mp3)
+    }
 
 def download_playlist(playlist_link: str, savePath: str):
     playlist = Playlist(playlist_link)
@@ -54,11 +56,15 @@ def download_playlist(playlist_link: str, savePath: str):
             print(f"Error downloading video: {e}")
 
 
+@app.route('/media/<path:filename>', methods=['GET'])
+def serve_media(filename):
+    return send_from_directory('media', filename)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         data = request.get_json()
-        link = data.get('link')
+        link = data.get('youtubeURL')
         savePath = data.get('directory') or 'media'
 
         try:
@@ -66,9 +72,10 @@ def index():
                 download_playlist(link, savePath)
                 message = '🎶 Successful Downloaded Playlist!'
             else:
-                download_video(link, savePath)
+                result = download_video(link, savePath)
                 message = '🎶 Successful Downloaded Video!'
-
+                return jsonify(result)
+            
             print(message)
             response = {
                 'status': 'Success',
@@ -89,16 +96,15 @@ def clean(videoFileName):
     os.remove(os.path.join('media', videoFileName))
 
 
-def nameConverter(title):
+def textSanitizer(title):
     # Remover espacios dobles
     title = re.sub(r'\s+', ' ', title)
     special_characters = ['°', '|', '/', '?', '*', '"']
 
     # Remover caracteres especiales usando una expresión regular
-    special_characters_regex = '|'.join(map(re.escape, special_characters))
-    title = re.sub(rf'[^\w\s{special_characters_regex}-]', '', title)
-
-    return title
+    for char in special_characters:
+        title = title.replace(char, '')
+    return title.strip()
 
 
 if __name__ == '__main__':
