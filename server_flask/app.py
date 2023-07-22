@@ -40,12 +40,12 @@ def download_video(link, savePath):
     return filename
 
 
-def download_playlist(playlist_link, savePath):
+def download_playlist(playlist_link: str, savePath: str):
     playlist = Playlist(playlist_link)
 
-    for video_url in playlist.video_urls:
+    for link in playlist:
         try:
-            download_video(video_url, savePath)
+            download_video(link, savePath)
         except Exception as e:
             print(f"Error downloading video: {e}")
 
