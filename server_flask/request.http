@@ -4,18 +4,28 @@
 
 @token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsidXN1YXJpb0lkIjoxNjksImFwbGljYWNpb25JZCI6NjksImZ1bmNpb25hcmlvSWQiOjI2OSwibXNQZXJzb25hSWQiOjUyNSwicGVyZmlsUGVyc29uYUlkIjoyODQsImNpIjoiMTA2MzExNDkifSwiaWF0IjoxNjg4MDc0OTczLCJleHAiOjE2OTA2NjY5NzN9.L-weCuJBRbV6pGhOC_7f9POOzgh3H2CsvLgVWP9ijuw
 
-### /* ----------------------------- todos los registros ----------------------------- */
+### /* ----------------------------- vericar el servicio ----------------------------- */
 GET {{urlBase}}
 content-type: application/json
 Authorization: {{token}}
 
-### --------------------------------- login para generar token -------------------------------------
+### --------------------------------- para descargar un video -------------------------------------
 POST {{urlBase}}
 content-type: application/json
 Authorization: {{token}}
 
 {
   "link": "https://music.youtube.com/watch?v=NjUk5R_DZ7g&list=RDAMVMmyeR8cZi-bw",
+  "directory": "/home/dev/Music/abc"
+}
+
+### --------------------------------- para descargar una playlist -------------------------------------
+POST {{urlBase}}
+content-type: application/json
+Authorization: {{token}}
+
+{
+  "link": "https://www.youtube.com/playlist?list=PLUHbLRE96WqC_JYFE3GQ8IDFOSoc8uqGm",
   "directory": "/home/dev/Music/abc"
 }
 
