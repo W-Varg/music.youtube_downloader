@@ -49,12 +49,14 @@ def download_video(link, savePath):
 def download_playlist(playlist_link: str, savePath: str):
     playlist = Playlist(playlist_link)
 
+    counter=0
     for link in playlist:
         try:
             download_video(link, savePath)
+            counter += 1
         except Exception as e:
             print(f"Error downloading video: {e}")
-
+    return counter
 
 @app.route('/media/<path:filename>', methods=['GET'])
 def serve_media(filename):
@@ -69,12 +71,12 @@ def index():
 
         try:
             if 'playlist' in link.lower():
-                download_playlist(link, savePath)
-                message = '🎶 Successful Downloaded Playlist!'
+                totalSuccessfulDownloads = download_playlist(link, savePath)
+                message = f'🎶 Downloaded Playlist!, Successful = {totalSuccessfulDownloads}'
             else:
                 result = download_video(link, savePath)
-                message = '🎶 Successful Downloaded Video!'
-                return jsonify(result)
+                message = '🎶 Successful: '+ result["audioName"]
+                # return jsonify(result)
             
             print(message)
             response = {
@@ -99,7 +101,7 @@ def clean(videoFileName):
 def textSanitizer(title):
     # Remover espacios dobles
     title = re.sub(r'\s+', ' ', title)
-    special_characters = ['°', '|', '/', '?', '*', '"']
+    special_characters = ['°', '|', '/', '?', '*', "'", "." '"']
 
     # Remover caracteres especiales usando una expresión regular
     for char in special_characters:
