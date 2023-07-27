@@ -99,14 +99,10 @@ def clean(videoFileName):
 
 
 def textSanitizer(title):
-    # Remover espacios dobles
-    title = re.sub(r'\s+', ' ', title)
-    special_characters = ['°', '|', '/', '?', '*', "'", "." '"']
-
-    # Remover caracteres especiales usando una expresión regular
-    for char in special_characters:
-        title = title.replace(char, '')
-    return title.strip()
+    sanitized_text = re.sub(r'[\\\/\'!?\¿¿"$%.\[\]]', '', title)
+    sanitized_text = re.sub(r'\s+', ' ', sanitized_text)
+    sanitized_text = sanitized_text.strip()
+    return sanitized_text
 
 
 if __name__ == '__main__':

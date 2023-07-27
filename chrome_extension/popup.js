@@ -45,22 +45,22 @@ document.addEventListener('DOMContentLoaded', function () {
           return response.json();
         })
         .then(data => {
-          const { audioName } = data;
-          const audioURL = `http://172.27.39.12:5000/media/${encodeURIComponent(audioName)}`;
+          const { audioName, message } = data;
+          // const audioURL = `http://172.27.39.12:5000/media/${encodeURIComponent(audioName)}`;
 
-          // Enviar mensaje al servicio de fondo para descargar el archivo
-          chrome.runtime.sendMessage({
-            action: 'downloadAudio',
-            audioURL,
-            audioName,
-          }, function (response) {
-            const { downloadId } = response;
-            if (downloadId) {
-              showAlert('Descarga de audio en progreso...');
-            } else {
-              showAlert('Error al iniciar la descarga.');
-            }
-          });
+          // // Enviar mensaje al servicio de fondo para descargar el archivo
+          // chrome.runtime.sendMessage({
+          //   action: 'downloadAudio',
+          //   audioURL,
+          //   audioName,
+          // }, function (response) {
+          //   const { downloadId } = response;
+          //   if (downloadId) {
+              showAlert(message);
+          //   } else {
+          //     showAlert('Error al iniciar la descarga.');
+          //   }
+          // });
         })
         .catch(() => showAlert('Error al realizar la petición.'));
     } else {
