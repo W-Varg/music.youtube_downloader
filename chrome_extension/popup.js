@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // }, function (response) {
           //   const { downloadId } = response;
           //   if (downloadId) {
-              showAlert(message);
+              // showAlert(message);
           //   } else {
           //     showAlert('Error al iniciar la descarga.');
           //   }
