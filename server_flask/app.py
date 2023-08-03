@@ -11,39 +11,56 @@ app = Flask(__name__)
 CORS(app)
 
 
-def download_video(link, savePath):
+def download_video(link, directorio_video, only_video=False, is_playlist=False):
     os.makedirs('media/videos', exist_ok=True)
 
     yt = YouTube(link)
-
-    # Combine title and author to create the filename
     author = yt.author
     title = textSanitizer(yt.title)
+    # Combine title and author to create the filename
     audioName = textSanitizer(f"{author} - {title}") + '.mp3'
     videoName = textSanitizer(f"{author} - {title}") + '.mp4'
 
     counter = 1
-    while os.path.exists(os.path.join('media/videos', videoName)):
+    while os.path.exists(os.path.join(directorio_video, videoName)):
         counter += 1
         videoName = textSanitizer(f"{title} ({counter})") + '.mp4'
 
     def download_in_thread():
-        nonlocal videoName
+        nonlocal videoName, audioName
         try:
             videoStream = yt.streams.get_highest_resolution()
-            videoStream.download('media/videos', videoName)
+            if is_playlist:
+                if only_video:
+                    videoStream.download(directorio_video, videoName)
+                    return f"🎶 Successful: {videoName}"
+                else:
+                    ultimo_nombre = os.path.basename(directorio_video)
+                    videoStream.download(os.path.join('media/videos', ultimo_nombre), videoName)
+                    video = VideoFileClip(os.path.join('media/videos', ultimo_nombre, videoName))
+                    audio = video.audio
 
-            video = VideoFileClip(os.path.join('media/videos', videoName))
-            audio = video.audio
+                    audioFileName = os.path.join(directorio_video, audioName)
+                    audio.write_audiofile(audioFileName)
+                    video.close()
+                    return f"🎶 Successful: {audioName}"
+            else:
+                if only_video:
+                    videoStream.download(directorio_video, videoName)
+                    return f"🎶 Successful: {videoName}"
+                else:
+                    videoStream.download(os.path.join('media/videos'), videoName)
+                    video = VideoFileClip(os.path.join('media/videos', videoName))
+                    audio = video.audio
 
-            audioFileName = os.path.join(savePath, audioName)
-            audio.write_audiofile(audioFileName)
+                    audioFileName = os.path.join(directorio_video, audioName)
+                    audio.write_audiofile(audioFileName)
+                    video.close()
+                    return f"🎶 Successful: {audioName}"
 
-            video.close()
-
-            print(f"🎶 Successful: {audioName}")
         except Exception as e:
             print(f"Error downloading video: {e}")
+            return None
 
     # Ejecuta la descarga en un hilo separado
     thread = threading.Thread(target=download_in_thread)
@@ -51,20 +68,25 @@ def download_video(link, savePath):
 
     return {
         'audioName': audioName,
-        'mimeType': 'audio/mpeg',
+        'videoName': videoName,
+        'mimeType': 'video/mp4' if only_video else 'video/mpeg',
     }
 
 
-def download_playlist(playlist_link: str, savePath: str):
+def download_playlist(playlist_link: str, savePath: str, only_video=False):
     playlist = Playlist(playlist_link)
+    playlist_folder_name = textSanitizer(playlist.title)  # Nombre de la playlist
+    # Crea la carpeta de la playlist
+    playlistPath = os.path.join(savePath, playlist_folder_name)
+    os.makedirs(playlistPath, exist_ok=True)  # Crea la carpeta de la playlist
 
     counter = 0
     threads = []
 
     for link in playlist:
         try:
-            thread = threading.Thread(
-                target=download_video, args=(link, savePath))
+            thread = threading.Thread(target=download_video, args=(
+                link, playlistPath, only_video, True))
             threads.append(thread)
             thread.start()
             counter += 1
@@ -89,15 +111,20 @@ def index():
         data = request.get_json()
         link = data.get('youtubeURL')
         savePath = data.get('directory') or 'media'
+        is_playlist = 'playlist' in link.lower()
+        only_video = data.get('onlyVideo', False)
 
         try:
-            if 'playlist' in link.lower():
-                totalSuccessfulDownloads = download_playlist(link, savePath)
-                message = f'🎶 Downloaded Playlist!, Successful = {totalSuccessfulDownloads}'
+            if is_playlist:
+                total_downloaded = download_playlist(link, savePath, only_video)
+                message = f'🎶 Downloaded Playlist!, Successful = {total_downloaded}'
             else:
-                result = download_video(link, savePath)
-                message = '🎶 Successful: ' + result["audioName"]
-                # return jsonify(result)
+                result = download_video(link, savePath, only_video)
+                if result is None:
+                    message = '🛑 Error downloading the video.'
+                else:
+                    message = '🎶 Successful: ' + \
+                        result['videoName'] if only_video else result['audioName']
 
             print(message)
             response = {
@@ -106,10 +133,7 @@ def index():
             }
             return jsonify(response)
         except Exception as e:
-            response = {
-                'status': 'Error',
-                'message': f'An error occurred: {e}',
-            }
+            response = {'status': 'Error', 'message': f'An error occurred: {e}', }
             return jsonify(response)
     else:
         return jsonify(message="Servicio de descarga y conversion de music.youtube.com")
@@ -139,3 +163,11 @@ if __name__ == '__main__':
 
 # example run server
 # python3 app.py 172.27.39.12:5000
+
+# Cuando la "link" sea una playlist y soloVideo=True, se creará un folder con el nombre de la playlist en el directorio enviado desde el frontend. Los videos se descargan en esa carpeta, y no se extraen los audios.
+
+# Cuando la "link" sea una playlist y soloVideo=False, se creará un folder con el nombre de la playlist en el directorio enviado desde el frontend. Los videos se descargan en la carpeta "media/videos", y los audios se extraen en el folder recién creado.
+
+# Cuando la "link" no sea una playlist y soloVideo=True, el video se descargará dentro del directorio enviado desde el frontend.
+
+# Cuando la "link" no sea una playlist y soloVideo=False, el video se descargará dentro de la carpeta "media/videos", y el audio se extraerá dentro del directorio enviado desde el frontend.

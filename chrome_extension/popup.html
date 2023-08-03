@@ -5,10 +5,24 @@
   <script src="popup.js"></script>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
   <input type="text" id="directoryInput" placeholder="Directorio">
   <button id="youtubeMusicButton" data-service="YouTube Music">YT Music</button>
-  <button id="youtubeButton" data-service="YouTube">YouTube</button>
+  <button id="youtubeButton" data-service="YouTube">
+    <span class="icon">
+      <i class="fas fa-music"></i>
+    </span>
+  </button>
+  <button id="youtubeVideoButton" data-service="YouTube" data-video="true">
+    <span class="icon">
+      <i class="fas fa-video" data-video="true"></i>
+    </span>
+  </button>
+  <div>
+    <input type="checkbox" id="returnDataCheckbox">
+    <label for="returnDataCheckbox">Devolver Datos</label>
+  </div>
 </body>
 </html>
