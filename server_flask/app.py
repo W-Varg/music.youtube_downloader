@@ -116,38 +116,36 @@ def serve_media(filename):
     return send_from_directory('media', filename)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['POST'])
 def index():
-    if request.method == 'POST':
-        data = request.get_json()
-        link = data.get('youtubeURL')
-        save_path = data.get('directory') or 'media'
-        is_playlist = 'playlist' in link.lower()
-        only_video = data.get('onlyVideo', False)
+    data = request.get_json()
+    link = data.get('youtubeURL')
+    save_path = data.get('directory') or 'media'
+    is_playlist = 'playlist' in link.lower()
+    only_video = data.get('onlyVideo', False)
 
-        try:
-            if is_playlist:
-                total_downloaded = download_playlist(link, save_path, only_video)
-                message = f'🎶 Downloaded Playlist!, Successful = {total_downloaded}'
+    try:
+        if is_playlist:
+            total_downloaded = download_playlist(link, save_path, only_video)
+            message = f'🎶 Downloaded Playlist!, Successful = {total_downloaded}'
+        else:
+            result = download_video(link, save_path, only_video)
+            if result is None:
+                message = '🛑 Error downloading the video.'
             else:
-                result = download_video(link, save_path, only_video)
-                if result is None:
-                    message = '🛑 Error downloading the video.'
-                else:
-                    message = '🎶 Successful: ' + \
-                              result['videoName'] if only_video else result['audioName']
+                message = '🎶 Successful: ' + result[0] if only_video else result[0]
 
-            print(message)
-            response = {
-                'status': 'Success',
-                'message': message,
-            }
-            return jsonify(response)
-        except Exception as e:
-            response = {'status': 'Error', 'message': f'An error occurred: {e}', }
-            return jsonify(response)
-    else:
-        return jsonify(message="Servicio de descarga y conversión de music.youtube.com")
+        print(message)
+        response = {'status': 'Success', 'message': message, }
+        return jsonify(response)
+    except Exception as e:
+        response = {'status': 'Error', 'message': f'An error occurred: {e}', }
+        return jsonify(response)
+
+
+@app.route('/', methods=['GET'])
+def index_get():
+    return jsonify(message="Servicio de descarga y conversión de music.youtube.com")
 
 
 if __name__ == '__main__':
