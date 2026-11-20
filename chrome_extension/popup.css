@@ -8,7 +8,7 @@ body {
   color: #f3f4f6;
   margin: 0;
   padding: 12px;
-  width: 280px;
+  width: 340px;
 }
 
 .container {
@@ -73,9 +73,46 @@ body {
   gap: 4px;
 }
 
+.field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
 .field label {
   font-size: 11px;
   color: #cbd5e1;
+}
+
+.open-dir-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.open-dir-btn:hover:not(:disabled) {
+  background-color: #475569;
+}
+
+.open-dir-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.icon-sm {
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
 }
 
 input[type="text"],
@@ -102,7 +139,7 @@ input[type="url"]:focus {
   margin-top: 2px;
 }
 
-button {
+.actions button {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -118,15 +155,15 @@ button {
   transition: filter 0.15s ease, transform 0.1s ease;
 }
 
-button:hover:not(:disabled) {
+.actions button:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 
-button:active:not(:disabled) {
+.actions button:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-button:disabled {
+.actions button:disabled {
   opacity: 0.6;
   cursor: wait;
 }
@@ -176,5 +213,152 @@ button:disabled {
 }
 
 .status.info {
+  color: #60a5fa;
+}
+
+.downloads-section {
+  border-top: 1px solid #33333d;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.downloads-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.downloads-header h2 {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-size: 11px;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.downloads-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.empty-state {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 4px 0;
+  text-align: center;
+}
+
+.download-item {
+  background-color: #2b2b33;
+  border: 1px solid #3a3a45;
+  border-radius: 6px;
+  padding: 7px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.download-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.download-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.cancel-btn {
+  background-color: #991b1b;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.progress-track {
+  width: 100%;
+  height: 5px;
+  background-color: #18181f;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background-color: #3b82f6;
+  transition: width 0.25s ease;
+}
+
+.download-item.completed .progress-fill {
+  background-color: #22c55e;
+}
+
+.download-item.error .progress-fill,
+.download-item.cancelled .progress-fill {
+  background-color: #ef4444;
+}
+
+.download-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.download-state {
+  font-weight: 600;
+}
+
+.download-item.completed .download-state {
+  color: #4ade80;
+}
+
+.download-item.error .download-state,
+.download-item.cancelled .download-state {
+  color: #f87171;
+}
+
+.download-item.downloading .download-state,
+.download-item.processing .download-state {
   color: #60a5fa;
 }

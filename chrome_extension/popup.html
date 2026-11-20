@@ -9,7 +9,7 @@
   <main class="container">
     <header class="header">
       <h1>Downloader</h1>
-      <span id="healthBadge" class="health-badge checking" title="Estado del servidor Flask">
+      <span id="healthBadge" class="health-badge checking" title="Estado del servidor Flask (clic para actualizar)">
         <span class="dot"></span>
         <span id="healthText">Verificando...</span>
       </span>
@@ -21,7 +21,15 @@
     </div>
 
     <div class="field">
-      <label for="directoryInput">Directorio de destino</label>
+      <div class="field-header">
+        <label for="directoryInput">Directorio de destino</label>
+        <button type="button" id="openDirectoryButton" class="open-dir-btn" title="Abrir directorio configurado en el explorador de archivos">
+          <svg class="icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z" fill="currentColor"/>
+          </svg>
+          <span>Abrir directorio</span>
+        </button>
+      </div>
       <input type="text" id="directoryInput" placeholder="media (por defecto)">
     </div>
 
@@ -54,6 +62,16 @@
     </label>
 
     <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+
+    <section class="downloads-section">
+      <div class="downloads-header">
+        <h2>Descargas</h2>
+        <button type="button" id="clearDownloadsButton" class="link-button" title="Quitar descargas finalizadas o canceladas">Limpiar</button>
+      </div>
+      <div id="downloadsList" class="downloads-list">
+        <p class="empty-state">Sin descargas recientes</p>
+      </div>
+    </section>
   </main>
 
   <script src="popup.js" defer></script>
