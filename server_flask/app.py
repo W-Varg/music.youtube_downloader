@@ -2,6 +2,7 @@ import glob
 import os
 import re
 import shutil
+import subprocess
 import sys
 import threading
 import uuid
@@ -390,6 +391,43 @@ def clear_downloads():
             DOWNLOADS.pop(jid, None)
             CANCEL_EVENTS.pop(jid, None)
     return jsonify({'status': 'Success', 'removed': len(removable)}), 200
+
+
+@app.route('/open-directory', methods=['POST'])
+def open_directory():
+    data = request.get_json(silent=True) or {}
+    raw_dir = (data.get('directory') or '').strip() or 'media'
+    abs_path = os.path.abspath(os.path.expanduser(raw_dir))
+
+    try:
+        os.makedirs(abs_path, exist_ok=True)
+        if sys.platform.startswith('linux'):
+            subprocess.Popen(
+                ['xdg-open', abs_path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        elif sys.platform == 'darwin':
+            subprocess.Popen(
+                ['open', abs_path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        elif os.name == 'nt':
+            os.startfile(abs_path)
+        else:
+            return jsonify({'status': 'Error', 'message': 'Sistema operativo no soportado para abrir carpetas.'}), 400
+
+        return jsonify({
+            'status': 'Success',
+            'directory': abs_path,
+            'message': f'Directorio abierto: {abs_path}',
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'Error',
+            'message': f'No se pudo abrir el directorio: {e}',
+        }), 500
 
 
 @app.route('/', methods=['POST'])
