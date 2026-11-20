@@ -1,21 +1,36 @@
 {
   "manifest_version": 3,
-  "name": "Extension for Downloader",
-  "version": "1.0",
-  "description": "Extensión que descarga el audio a un directorio",
+  "name": "Audio & Video Downloader",
+  "version": "2.0.0",
+  "description": "Extensión para descargar audio (MP3) o video (MP4) desde YouTube y YouTube Music mediante servidor Flask",
+  "minimum_chrome_version": "116",
   "permissions": [
-    "notifications",
     "activeTab",
     "downloads",
+    "notifications",
     "storage",
     "tabs"
   ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "http://*/*",
+    "https://www.youtube.com/*",
+    "https://music.youtube.com/*"
+  ],
   "icons": {
-    "16": "logo16.png"
+    "16": "logo16.png",
+    "48": "logo16.png",
+    "128": "audio.png"
   },
   "action": {
+    "default_title": "Audio & Video Downloader",
     "default_popup": "popup.html",
-    "default_encoding": "utf-8"
+    "default_icon": {
+      "16": "logo16.png",
+      "48": "logo16.png",
+      "128": "audio.png"
+    }
   },
   "background": {
     "service_worker": "background.js"
