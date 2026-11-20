@@ -1,6 +1,6 @@
 
 ##local
-@urlBase = http://127.0.0.1:5000
+@urlBase = http://127.0.0.1:6000
 
 @token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsidXN1YXJpb0lkIjoxNjksImFwbGljYWNpb25JZCI6NjksImZ1bmNpb25hcmlvSWQiOjI2OSwibXNQZXJzb25hSWQiOjUyNSwicGVyZmlsUGVyc29uYUlkIjoyODQsImNpIjoiMTA2MzExNDkifSwiaWF0IjoxNjg4MDc0OTczLCJleHAiOjE2OTA2NjY5NzN9.L-weCuJBRbV6pGhOC_7f9POOzgh3H2CsvLgVWP9ijuw
 
@@ -30,7 +30,7 @@ Authorization: {{token}}
 }
 
 # curl -X 'POST' \
-#   'http://127.0.0.1:5000/' \
+#   'http://127.0.0.1:6000/' \
 #   -H 'accept: */*' \
 #   -H 'Content-Type: application/json' \
 #   -d '{
