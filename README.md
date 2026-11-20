@@ -80,7 +80,7 @@ env\Scripts\activate.bat
 
 ### 4. Instalar las dependencias
 
-Con el entorno virtual activado, instala los paquetes listados en `server_flask/requirements.txt` (`Flask`, `Flask-Cors`, `gunicorn`, `moviepy`, `pytube`):
+Con el entorno virtual activado, instala los paquetes listados en `server_flask/requirements.txt` (`Flask`, `Flask-Cors`, `gunicorn`, `yt-dlp`, `imageio-ffmpeg`):
 
 ```bash
 pip install --upgrade pip
@@ -106,9 +106,9 @@ pip install --upgrade pip
 pip install --upgrade -r requirements.txt
 ```
 
-> **Nota:** Si YouTube cambia su API y las descargas fallan, actualiza `pytube` manualmente con:
+> **Nota:** Si YouTube cambia su API y las descargas fallan, actualiza `yt-dlp` manualmente con:
 > ```bash
-> pip install --upgrade pytube
+> pip install --upgrade yt-dlp
 > ```
 > Si hubo cambios en la carpeta `chrome_extension/`, recuerda hacer clic en el botón **Recargar** (↻) de la extensión en `chrome://extensions/` o `brave://extensions/`.
 
@@ -120,7 +120,7 @@ Asegúrate de estar dentro de `server_flask/` con el entorno virtual activado.
 
 ### Opción A: Modo desarrollo (Flask)
 
-Inicia el servidor en `0.0.0.0:6000` (accesible desde `127.0.0.1:6000` y tu red local):
+Inicia el servidor en `0.0.0.0:6001` (accesible desde `127.0.0.1:6001` y tu red local):
 
 ```bash
 python3 app.py
@@ -129,7 +129,7 @@ python3 app.py
 También puedes especificar una IP y puerto concretos como argumento:
 
 ```bash
-python3 app.py 127.0.0.1:6000
+python3 app.py 127.0.0.1:6001
 ```
 
 ### Opción B: Producción con Gunicorn
@@ -137,7 +137,7 @@ python3 app.py 127.0.0.1:6000
 Usando `gunicorn` directamente:
 
 ```bash
-gunicorn app:app -b 0.0.0.0:6000 --log-level=error
+gunicorn app:app -b 0.0.0.0:6001 --log-level=error
 ```
 
 O ejecutando el script incluido (ajusta la IP dentro de `server_flask/run_app.sh` si es necesario):
@@ -149,15 +149,20 @@ chmod +x run_app.sh
 
 ### Verificar que el servidor está activo
 
+Puedes verificar el estado en tu navegador o con `curl` usando los endpoints `/health` o `/info`:
+
 ```bash
-curl http://127.0.0.1:6000/
+curl http://127.0.0.1:6001/health
+curl http://127.0.0.1:6001/info
 ```
 
-Deberías recibir:
+Respuesta de `/health`:
 
 ```json
-{"message": "Servicio de descarga y conversión de music.youtube.com"}
+{"service": "audio_downloader", "status": "ok", "timestamp": "..."}
 ```
+
+> **Nota:** Evita usar el puerto `6000`, ya que Chrome/Brave/Edge lo bloquean con `ERR_UNSAFE_PORT` (reservado para X11).
 
 ---
 
@@ -180,7 +185,7 @@ Deberías recibir:
 2. **Abre YouTube o YouTube Music** en una pestaña del navegador y navega al video, canción o playlist que deseas descargar.
 3. **Haz clic en el ícono de la extensión** en la barra del navegador.
 4. **Configura y descarga** usando los controles del popup:
-   - **Campo `Servidor Flask`:** URL donde corre el servidor (por defecto `http://127.0.0.1:6000`; puedes cambiar el puerto o usar una IP de tu red local, por ejemplo `http://127.0.0.1:6001`). Se guarda automáticamente.
+   - **Campo `Servidor Flask`:** URL donde corre el servidor (por defecto `http://127.0.0.1:6001`; puedes cambiar el puerto o usar una IP de tu red local). Se guarda automáticamente y el indicador **Online / Offline** en la cabecera consulta `/health` automáticamente.
    - **Campo `Directorio de destino`:** Ruta absoluta del servidor donde quieres guardar los archivos (por ejemplo, `/home/usuario/Music`). El valor se guarda automáticamente en el navegador. Si lo dejas vacío, los archivos se guardarán en `server_flask/media/`.
    - **Botón `YT Music` (azul):** Busca la pestaña activa o abierta de `music.youtube.com` y descarga el audio en formato **`.mp3`**.
    - **Botón `YT Audio` (rojo):** Busca la pestaña activa o abierta de `www.youtube.com` y descarga el audio en formato **`.mp3`**.
@@ -198,7 +203,7 @@ Si la pestaña abierta corresponde a una URL de playlist (contiene `playlist` en
 También puedes disparar descargas directamente mediante `POST /` sin usar la extensión:
 
 ```bash
-curl -X POST http://127.0.0.1:6000/ \
+curl -X POST http://127.0.0.1:6001/ \
   -H "Content-Type: application/json" \
   -d '{
     "youtubeURL": "https://music.youtube.com/watch?v=NjUk5R_DZ7g",
